@@ -1,0 +1,54 @@
+.employee-form {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+  }
+  
+  .employee-form h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .employee-form .MuiTextField-root {
+    margin-bottom: 16px;
+  }
+  
+  .employee-form .MuiFormControl-root {
+    margin-bottom: 16px;
+  }
+  
+  .employee-form .error-text {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: -8px;
+    margin-bottom: 8px;
+  }
+  
+  .employee-form .MuiButton-root {
+    width: 48%;
+  }
+  
+  .employee-form .MuiButton-root:first-of-type {
+    margin-right: 4%;
+  }
+  
+  .employee-form .MuiRadioGroup-root {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 16px;
+  }
+  
+  .employee-form .MuiRadio-root {
+    color: #1976d2; /* Primary color */
+  }
+  
+  .employee-form .MuiRadio-root.Mui-checked {
+    color: #0d47a1; /* Darker primary */
+  }
+  

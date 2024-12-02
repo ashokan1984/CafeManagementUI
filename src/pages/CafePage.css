@@ -1,0 +1,86 @@
+#root {
+    width: 100%;
+}
+
+.cafe-page {
+    display: flex;
+    align-items: center; /* Vertically center */
+    min-height: 100vh; /* Full viewport height */
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    flex-direction: column;
+  }
+  
+  .cafe-content {
+    width: 80%; /* Adjust width as needed */
+    max-width: 1200px; /* Maximum width */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .ag-theme-material {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  .add-button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-button:hover {
+    background-color: #1565c0;
+  }
+  
+  
+  .ag-root.ag-layout-normal, .ag-root.ag-layout-auto-height {
+    overflow: hidden;
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  /* Custom styles for Ag-Grid header */
+.ag-theme-material .ag-header-cell {
+    background-color: #f1f1f1;  /* Light gray background */
+    font-weight: bold;          /* Bold text */
+  }
+  
+  .ag-theme-material .header-logo {
+    background-color: #e0f7fa;  /* Light blue for logo header */
+  }
+  
+  .ag-theme-material .header-name {
+    background-color: #ffe0b2;  /* Light orange for name header */
+    text-align: center;
+  }
+  
+  .ag-theme-material .header-description {
+    background-color: #c8e6c9;  /* Light green for description header */
+  }
+  
+  .ag-theme-material .header-employees {
+    background-color: #d1c4e9;  /* Light purple for employees header */
+  }
+  
+  .ag-theme-material .header-location {
+    background-color: #fff59d;  /* Light yellow for location header */
+    text-align: right;
+  }
+  
+  .ag-theme-material .header-actions {
+    background-color: #ffccbc;  /* Light pink for actions header */
+    width: 100%;
+  }
+  
+  /* Optional: Increase padding for all header cells */
+  .ag-theme-material .ag-header-cell {
+    padding: 12px;
+  }
