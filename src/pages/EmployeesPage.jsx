@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate  } from "react-router-dom";
 import { Button } from "@mui/material";
 import { AgGridReact } from "ag-grid-react";
-import { getEmployeesByCafeId } from "../api/employees"; // Mock or actual API endpoint
+import { deleteEmployee, getEmployeesByCafeId } from "../api/employees"; // Mock or actual API endpoint
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-material.css";
 import "./EmployeesPage.css";
@@ -29,14 +29,40 @@ const EmployeesPage = () => {
     { field: "noOfDaysWorked", headerName: "Days Worked", sortable: true },
     { field: "cafeName", headerName: "Café Name", sortable: true },
     {
+      field: "id", 
       headerName: "Actions",
       cellRenderer: ActionsRenderer,
       cellRendererParams: {
-        onEdit: (id) => console.log(`Edit employee ${id}`), // Replace with actual edit logic
-        onDelete: (id) => console.log(`Delete employee ${id}`), // Replace with actual delete logic
+        onEdit: (id) => console.log(`Edit employee ${id}`),
+        onDelete: (id) => handleDelete(id), 
       },
     },
   ];
+
+ // Handle the delete functionality
+const handleDelete = (id) => {
+    alert(`Deleting employee with ID: ${id}`);
+    console.log(`Deleting employee with ID: ${id}`);
+
+    // Show confirmation dialog before proceeding with deletion
+    if (window.confirm("Are you sure you want to delete this employee?")) {
+      // Call the employee delete method with the employee ID
+      deleteEmployee(id)
+        .then(() => {
+          // Optionally, reload the employee list from the API to get the latest data
+          getEmployeesByCafeId(cafeId).then((data) => {
+            setEmployees(data); // Update the grid with the latest list of employees
+          });
+
+          alert("Employee deleted successfully!"); // Show success message
+        })
+        .catch((error) => {
+          console.error("Error deleting employee:", error);
+          alert("Failed to delete employee. Please try again."); // Show error message
+        });
+    }
+};
+
 
   const onGridReady = (params) => {
     gridApi.current = params.api;
@@ -50,8 +76,7 @@ const EmployeesPage = () => {
   return (
     <div className="employees-page">
       <div className="employees-header">
-        <h1>Employees of Café {cafeId}</h1>
-        <Button variant="contained" color="primary" onClick={handleAddEmployee}>
+         <Button variant="contained" color="primary" onClick={handleAddEmployee}>
           Add New Employee
         </Button>
       </div>
@@ -68,25 +93,25 @@ const EmployeesPage = () => {
 };
 
 // ActionsRenderer Component
-const ActionsRenderer = ({ data }) => (
-  <div style={{ display: "flex", gap: "5px" }}>
-    <Button
-      variant="contained"
-      color="primary"
-      size="small"
-      onClick={() => console.log(`Edit employee ${data.employeeId}`)}
-    >
-      Edit
-    </Button>
-    <Button
-      variant="contained"
-      color="secondary"
-      size="small"
-      onClick={() => console.log(`Delete employee ${data.employeeId}`)}
-    >
-      Delete
-    </Button>
-  </div>
-);
+const ActionsRenderer = ({ data, onEdit, onDelete }) => (
+    <div style={{ display: "flex", gap: "5px" }}>
+      <Button
+        variant="contained"
+        color="primary"
+        size="small"
+        onClick={() => onEdit(data.id)} // Use data.employeeId
+      >
+        Edit
+      </Button>
+      <Button
+        variant="contained"
+        color="secondary"
+        size="small"
+        onClick={() => onDelete(data.id)} // Use data.employeeId
+      >
+        Delete
+      </Button>
+    </div>
+  );
 
 export default EmployeesPage;
