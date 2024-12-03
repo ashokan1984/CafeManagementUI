@@ -7,7 +7,6 @@ export const getEmployeesByCafeId = async (cafeId) => {
     return response.data;
  };
 
-
  export const createEmployee = async (employeeData) => {
     const baseUrl = import.meta.env.VITE_APP_API_BASE_URL;
     const response = await axios.post(`${baseUrl}/Employees/CreateEmployee`, employeeData);

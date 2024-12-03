@@ -2,15 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, Button, Typography, TextField } from "@mui/material";
 import { AgGridReact } from "ag-grid-react";
 import { useNavigate } from "react-router-dom";
-import { getCafes, createCafe, deleteCafe } from "../api/cafes"; // Import deleteCafe method
-import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS
-import "ag-grid-community/styles/ag-theme-material.css"; // Material theme
+import { getCafes, createCafe, deleteCafe, updateCafe } from "../api/cafes"; // Add updateCafe method
+import "ag-grid-community/styles/ag-grid.css"; 
+import "ag-grid-community/styles/ag-theme-material.css"; 
 import "./CafePage.css";
 
 const CafesPage = () => {
-  const gridApi = useRef(null); // Reference for the grid API
+  const gridApi = useRef(null); 
   const [cafes, setCafes] = useState([]);
-  const [showForm, setShowForm] = useState(false); // To toggle the form visibility
+  const [showForm, setShowForm] = useState(false);
   const [newCafe, setNewCafe] = useState({
     name: "",
     description: "",
@@ -20,36 +20,35 @@ const CafesPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCafes().then((data) => setCafes(data)); // Fetch existing cafes
+    getCafes().then((data) => setCafes(data)); 
   }, []);
 
   const columnDefs = [
-    { field: "logoDetail", headerName: "Logo", cellRenderer: LogoRenderer, headerClass: 'header-logo', headerStyle: { fontWeight: 'bold', backgroundColor: '#f0f0f0' }},
-    { field: "name", headerName: "Name", headerClass: 'header-name', headerStyle: { textAlign: 'center', fontSize: '16px' }},
-    { field: "description", headerName: "Description", headerClass: 'header-description', headerStyle: { fontSize: '14px', color: '#444' }},
-    { field: "employeeCount", headerName: "Number Of Employees", headerClass: 'header-employees', headerStyle: { color: '#00796b', fontSize: '16px' }},
-    { field: "location", headerName: "Location", headerClass: 'header-location', headerStyle: { textAlign: 'right', fontSize: '16px', color: '#333' }},
+    { field: "logoDetail", headerName: "Logo", cellRenderer: LogoRenderer },
+    { field: "name", headerName: "Name" },
+    { field: "description", headerName: "Description" },
+    { field: "employeeCount", headerName: "Number Of Employees" },
+    { field: "location", headerName: "Location" },
     {
       field: "id",
       headerName: "Actions",
-      headerClass: 'header-actions',
       cellRenderer: ActionsRenderer,
       cellRendererParams: {
-        onEdit: (cafeId) => navigate(`/cafes/edit/${cafeId}`),
+        onEdit: (cafeId) => {
+          const cafeData = cafes.find((cafe) => cafe.id === cafeId);
+          console.log("Navigating with data:", cafeData);
+          navigate(`/cafes/edit/${cafeId}`, { state: { defaultValues: cafeData } });
+        },
         onDelete: (cafeId) => handleDelete(cafeId),
         onViewEmployees: (cafeId) => { navigate(`/employees/${cafeId}`); }
       },
     }
   ];
 
-  // Handle the delete functionality
   const handleDelete = (id) => {
-    // Show confirmation dialog before proceeding with deletion
     if (window.confirm("Are you sure you want to delete this café?")) {
-      // Call the deleteCafe method with the cafe ID
       deleteCafe(id)
         .then(() => {
-          // Filter out the deleted cafe from the list
           setCafes((prevCafes) => prevCafes.filter((cafe) => cafe.id !== id));
           alert("Cafe deleted successfully!");
         })
@@ -62,33 +61,32 @@ const CafesPage = () => {
 
   useEffect(() => {
     if (gridApi.current) {
-      gridApi.current.sizeColumnsToFit(); // Automatically size the columns to fit the grid's width
+      gridApi.current.sizeColumnsToFit(); 
     }
-  }, [cafes]); // When data changes, resize columns
+  }, [cafes]);
 
   const onGridReady = (params) => {
     gridApi.current = params.api;
-    params.api.sizeColumnsToFit(); // Fit the columns when the grid is ready
+    params.api.sizeColumnsToFit(); 
   };
 
-  // Handle form submission for creating a new cafe
   const handleSubmit = () => {
-    createCafe(newCafe).then((response) => {
-      setCafes((prevCafes) => [...prevCafes, response]); // Add the newly created cafe to the list
-      alert("Cafe created successfully!"); // Show the success message
-
-      // Clear the form fields after the success message
-      setNewCafe({
-        name: "",
-        description: "",
-        logo: { bytes: "", contentType: "" },
-        location: "",
-      }); // Reset the form fields to empty
+    // Ensure that logo is always defined
+    const cafeToSubmit = {
+      ...newCafe,
+      logo: newCafe.logo || { bytes: "", contentType: "" },  // Default to an empty logo object if not set
+    };
+  
+    createCafe(cafeToSubmit).then((response) => {
+      setCafes((prevCafes) => [...prevCafes, response]);
+      alert("Cafe created successfully!");
+      setNewCafe({ name: "", description: "", logo: { bytes: "", contentType: "" }, location: "" });
     }).catch((error) => {
       console.error("Error creating cafe:", error);
       alert("Failed to create cafe.");
     });
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -98,7 +96,6 @@ const CafesPage = () => {
     }));
   };
 
-  // Handle file input and convert image to base64
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -107,13 +104,19 @@ const CafesPage = () => {
         setNewCafe((prevCafe) => ({
           ...prevCafe,
           logo: {
-            bytes: reader.result.split(',')[1], // Get base64 encoded string without 'data:image/*;base64,' prefix
+            bytes: reader.result.split(',')[1],
             contentType: file.type,
           },
         }));
       };
-      reader.readAsDataURL(file); // Convert file to base64
+      reader.readAsDataURL(file);
     }
+  };
+
+  // Handle Cancel button
+  const handleCancel = () => {
+    setShowForm(false); // Close the form
+    navigate("/");  // Navigate back to CafesPage
   };
 
   return (
@@ -121,10 +124,9 @@ const CafesPage = () => {
       <div className="cafe-header">
         <h1>Café Manager</h1>
         <Button
-          className="add-button"
           variant="contained"
           color="primary"
-          onClick={() => setShowForm(true)} // Show the form when clicked
+          onClick={() => setShowForm(true)} 
         >
           Add New Café
         </Button>
@@ -160,22 +162,19 @@ const CafesPage = () => {
             value={newCafe.location}
             onChange={handleChange}
           />
-
-          {/* File input for logo */}
           <input
             type="file"
             accept="image/*"
             onChange={handleLogoChange}
             style={{ marginTop: '10px' }}
           />
-
           <Button variant="contained" color="primary" onClick={handleSubmit}>
             Submit
           </Button>
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => setShowForm(false)} // Close the form without saving
+            onClick={handleCancel}  // Close the form and navigate back to CafesPage
           >
             Cancel
           </Button>
@@ -192,8 +191,8 @@ const CafesPage = () => {
 };
 
 const LogoRenderer = ({ value }) => <img src={`data:${value.contentType};base64,${value.bytes}`} alt="Logo" width="50" />;
-const ActionsRenderer = ({ value, onEdit, onDelete, onViewEmployees }) => (
-  <div style={{ display: 'flex', width: '100%', gap: '5px' }}>
+const ActionsRenderer = ({ value, data, onEdit, onDelete, onViewEmployees }) => (
+  <div style={{ display: 'flex', gap: '5px' }}>
     <Button variant="contained" color="primary" size="small" onClick={() => onViewEmployees(value)}>
       View Employees
     </Button>
